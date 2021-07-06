@@ -56,14 +56,14 @@ class SESSender:
         if self.aws_creds_present == False:
 
             # store some messages to use later
-            cred_instructions_msg = ("You need to either set environment variables for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY,"
-                                    " or create a file with these keys and their corresponding values at ")
-            cred_readme_msg = ("For help setting up IAM users on AWS, retrieving credentials, and setting policies, "
+            cred_instructions_msg = ("\nYou need to either set environment variables for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY,"
+                                    " or create a file with these keys and their corresponding values at \n")
+            cred_readme_msg = ("\nFor help setting up IAM users on AWS, retrieving credentials, and setting policies, "
                             "checkout the README for py-basic-ses at https://git.swilsycloud.com/useful-apps-and-libraries/py-basic-ses.")
             
             # If the OS is not Linux or Windows, print error and bail stop routine.
             if platform.system() != "Linux" and platform.system() != "Windows":
-                print("Error: We don't recognize your operating system. py-basic-ses supports Windows or Linux.")
+                print("\nError: We don't recognize your operating system. py-basic-ses supports Windows or Linux.")
                 return
 
             # now check for the credentials file
@@ -77,7 +77,7 @@ class SESSender:
             # does the path exist?
             if os.path.exists(self.credpath) == False:
                 # if not, print a helpful error message, and bail out of this routine.
-                print("Error: There is a problem with your AWS credentials.")
+                print("\nError: There is a problem with your AWS credentials.")
                 print(cred_instructions_msg + self.credpath)
                 print(cred_readme_msg)
                 return
@@ -85,7 +85,7 @@ class SESSender:
                 # is credentials a file?
                 if os.path.isfile(self.credpath) == False:
                     # if not, print a helpful error message and bail out of this routine.
-                    print("Error: There is a problem with your AWS credentials.")
+                    print("\nError: There is a problem with your AWS credentials.")
                     print(self.credpath + " is not a file.")
                     print(cred_instructions_msg + self.credpath)
                     print(cred_readme_msg)
@@ -95,7 +95,7 @@ class SESSender:
                     # do we have read access on the credentials file?
                     if os.access(self.credpath, os.R_OK) == False:
                         # if not, print a helpful error message and bail out of this routine.
-                        print("Error: Your credentials file exists, and is in the right place, but you don't have access to read its contents. Please fix this permissions issue.")
+                        print("\nError: Your credentials file exists, and is in the right place, but you don't have access to read its contents. Please fix this permissions issue.")
                         print(cred_instructions_msg + self.credpath)
                         print(cred_readme_msg)
                         return
@@ -103,10 +103,11 @@ class SESSender:
                         # read the contents of the file and look for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
                         with open(self.credpath, "r") as cred_file:
                             cred_content = cred_file.read()
-                            if cred_content.find("AWS_ACCESS_KEY_ID") != -1 and cred_content.find("AWS_SECRET_ACCESS_KEY") != -1:
+                            if cred_content.find("AWS_ACCESS_KEY_ID=") != -1 and cred_content.find("AWS_SECRET_ACCESS_KEY=") != -1:
                                 self.aws_creds_present = True
                             else:
-                                print("Error: Your credentials file is missing something we need.")
+                                print("\nError: Your credentials file is missing something we need.")
+                                print("Your credentials file is missing either AWS_ACCESS_KEY_ID= or AWS_SECRET_ACCESS_KEY= \n")
                                 print(cred_instructions_msg + self.credpath)
                                 print(cred_readme_msg)
                                 return                            
