@@ -68,7 +68,7 @@ class SESSender:
 
             # now check for the credentials file
             if platform.system() == 'Linux':
-                self.credpath = "~/.aws/credentials"
+                self.credpath = os.path.expanduser("~/.aws/credentials")
             
             if platform.system() == "Windows":
                 self.credpath = "C:\\Users\\" + os.getlogin() + "\\.aws\\credentials"
