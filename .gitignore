@@ -5,3 +5,4 @@ venv_py_basic_ses/
 *.egg-info/
 .env
 .vscode/
+testing.py
