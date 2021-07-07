@@ -18,6 +18,8 @@ setup(
     
     ],
 
+    python_requires = '>=3.8.*,!=3.10.*',
+
     classifiers=[
         'License :: OSI Approved :: MIT License',
         'Operating System :: Microsoft :: Windows :: Windows 10',
