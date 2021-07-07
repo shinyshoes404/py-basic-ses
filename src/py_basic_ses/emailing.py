@@ -75,7 +75,7 @@ class SESSender:
                                 
 
         cred_readme_msg = ("\nFor help setting up IAM users on AWS, retrieving credentials, and setting policies, "
-                        "checkout the README for py-basic-ses at \nhttps://git.swilsycloud.com/useful-apps-and-libraries/py-basic-ses.\n")
+                        "checkout the README for py-basic-ses at \nhttps://github.com/shinyshoes404/py-basic-ses\n")
 
         
         # does the path exist?

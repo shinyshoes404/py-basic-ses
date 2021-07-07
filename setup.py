@@ -4,7 +4,7 @@ setup(
     name='py-basic-ses',
     version='0.1.0',    
     description="A simple python command line application and library to help send emails via Amazon Web Services' Simple Email Service, or AWS SES.",
-    url='https://git.swilsycloud.com/useful-apps-and-libraries/py-basic-ses',
+    url='https://github.com/shinyshoes404/py-basic-ses',
     author='shinyshoes',
     author_email='shinyshoes404@protonmail.com',
     license='MIT License',
