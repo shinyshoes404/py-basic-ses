@@ -14,9 +14,13 @@ setup(
                     'send-email=py_basic_ses.entry:send_email']},
     install_requires=[
         'boto3>=1.17',
-        'click'
-    
+        'click'    
     ],
+
+    extras_require={
+        # To install reequirements for dev work use 'pip install -e .[dev]'
+        'dev': ['coverage', 'mock']
+    },
 
     python_requires = '>=3.8.*,!=3.10.*',
 

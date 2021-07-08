@@ -6,3 +6,4 @@ venv_py_basic_ses/
 .env
 .vscode/
 testing.py
+.coverage

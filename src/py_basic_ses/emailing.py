@@ -48,20 +48,21 @@ class SESSender:
         if os.environ.get('AWS_ACCESS_KEY_ID') and os.environ.get('AWS_SECRET_ACCESS_KEY'):
             self.aws_creds_present = True
             return True
-
+        
         # Since we don't have the environment variables we need present, we will need to use a credentials file
         # Start by determining the OS of the system running this application to determine the expected path to
         # the credentials file.                      
         # If the OS is not Linux or Windows, print error and stop routine. We are not supporting other operating systems
         if platform.system() != "Linux" and platform.system() != "Windows":
             print("\nError: We don't recognize your operating system. py-basic-ses supports Windows or Linux.\n")
+            print(platform.system())
             return False
 
         # determine the expected path to the credentials file based on the operating system
         if platform.system() == "Linux":
             # using expanduser() method to convert ~ into /home/<username>
             self.credpath = os.path.expanduser("~/.aws/credentials")
-        
+                    
         if platform.system() == "Windows":
             self.credpath = "C:\\Users\\" + os.getlogin() + "\\.aws\\credentials"
 
