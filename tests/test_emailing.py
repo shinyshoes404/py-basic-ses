@@ -1,6 +1,5 @@
 import os, platform
 import unittest, mock
-import boto3
 
 # import the SESSender class, so we can test it
 from py_basic_ses.emailing import SESSender
