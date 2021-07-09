@@ -55,7 +55,6 @@ class SESSender:
         # If the OS is not Linux or Windows, print error and stop routine. We are not supporting other operating systems
         if platform.system() != "Linux" and platform.system() != "Windows":
             print("\nError: We don't recognize your operating system. py-basic-ses supports Windows or Linux.\n")
-            print(platform.system())
             return False
 
         # determine the expected path to the credentials file based on the operating system
