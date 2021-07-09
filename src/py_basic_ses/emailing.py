@@ -48,7 +48,7 @@ class SESSender:
         if os.environ.get('AWS_ACCESS_KEY_ID') and os.environ.get('AWS_SECRET_ACCESS_KEY'):
             self.aws_creds_present = True
             return True
-
+        
         # Since we don't have the environment variables we need present, we will need to use a credentials file
         # Start by determining the OS of the system running this application to determine the expected path to
         # the credentials file.                      
@@ -61,7 +61,7 @@ class SESSender:
         if platform.system() == "Linux":
             # using expanduser() method to convert ~ into /home/<username>
             self.credpath = os.path.expanduser("~/.aws/credentials")
-        
+                    
         if platform.system() == "Windows":
             self.credpath = "C:\\Users\\" + os.getlogin() + "\\.aws\\credentials"
 
