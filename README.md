@@ -1,5 +1,5 @@
 # py-basic-ses
-py-basic-ses provides a command line application and library to send emails via Amazon Web Services' Simple Email Service, or AWS SES, API by leveraging the boto3 library and written in Python.  
+py-basic-ses provides a command line application and library to send emails via Amazon Web Services' Simple Email Service, or AWS SES, API by leveraging the boto3 library.  
 
 **This package requires**
 
@@ -52,7 +52,7 @@ With py-basic-ses installed you will have two commands available from the termin
 
 Below are examples of commands for sending a test email and sending a production email.  
 
-Remember, you need to have your credentials stored on properly. See the **Credentials** seciont of this README for more details.
+Remember, you need to have your credentials stored properly on your machine. See the **Credentials** section of this README for more details.
 <br>
 
 **Sending a test email**  
@@ -72,30 +72,30 @@ The `send-email` command will send a two part message with html as the primary e
 
 ## Library
 
-Below is a code sample demonstrating how you would send an email using py-basic-ses. Remember, you need to have your credentials stored on properly. See the **Credentials** seciont of this README for more details.
+Below is a code sample demonstrating how you would send an email using py-basic-ses. Remember, you need to have your credentials stored properly on your machine. See the **Credentials** section of this README for more details.
 
 ```
 # import the SESSender class
 from py-basic-ses.emailing import SESSender
 
 def ses_send_email():
-    to_email_address = "to-user@to-domain.com" # Required
-    from_email_address = "from-user@from-domain.com" # Required
-    email_from_name = "From User" # Optional
-    email_message_txt = "This is an awesome email message." # Required
-    email_message_html = "<h1>Awesome Email</h1><p>This is an awesome html formatted email.</p>" # Optional
-    email_subject = "Awesome Subject" # Optional
-    ses_aws_region = "us-west-2" # Required
+    to_email_address = "to-user@to-domain.com" 
+    from_email_address = "from-user@from-domain.com"
+    email_from_name = "From User"
+    email_message_txt = "This is an awesome email message."
+    email_message_html = "<h1>Awesome Email</h1><p>This is an awesome html formatted email.</p>"
+    email_subject = "Awesome Subject"
+    ses_aws_region = "us-west-2"
 
 
     # instantiate the SESSender object
-    ses_send_obj = SESSender(sendto=to_email_address,
-                            fromaddr=from_email_address,
-                            fromname=email_from_name,
-                            message_txt=email_message_txt,
-                            message_html=email_message_html,
-                            msgsubject=email_subject,
-                            aws_region=ses_aws_region)
+    ses_send_obj = SESSender(sendto=to_email_address,           # Required
+                            fromaddr=from_email_address,        # Required
+                            fromname=email_from_name,           # Optional
+                            message_txt=email_message_txt,      # Required
+                            message_html=email_message_html,    # Optional
+                            msgsubject=email_subject,           # Optional
+                            aws_region=ses_aws_region)          # Required
 
     # validate the arguments and credentials before trying to send our email using the ses_validate method
     check_validation = ses_send_obj.ses_validate()
@@ -131,7 +131,6 @@ Please, checkout Amazon's <a href='https://docs.aws.amazon.com/ses/latest/Develo
 
 Below is each step with screen shots and more detailed instructions.
 
-<br>
 
 ### Create an Amazon Web Services account
 
@@ -141,7 +140,7 @@ Sorry, not going to walk you through this. Go to aws.amazon.com and register.
 
 ### Register your domain
 
-You will need to own and control the domain you want to send email from. AWS offers registration and DNS services through their Route 53 offering. Just search for Route 53 once you are logged into the AWS mangement console. You can also register your domain from another registrar, but it is convenient to have everything under one account. Also, AWS DNS entry propogate very quickly, like in a couple of minutes. I have had to wait for up to 20 - 30 minutes with another registrar.
+You will need to own and control the domain you want to send email from. AWS offers registration and DNS services through their Route 53 offering. Just search for Route 53 once you are logged into the AWS mangement console. You can also register your domain from another registrar, but it is convenient to have everything under one account. Also, AWS DNS entries propogate very quickly, like in a couple of minutes. I have had to wait for up to 20 - 30 minutes with another registrar.
 
 <br>
 
@@ -151,40 +150,28 @@ After logging into the AWS management console. Type 'SES' into the search bar in
 
 <img src="./docs/images/1_search_ses.JPG" height="300px"/>
 
-<br>
 
-Once you are in the SES Management Console (you will see SES Home in top of the left navigation panel), you will need to select the region you want your SES service to operate in. Each region reprsents an AWS data center in geogrphic location. Notice the labels next to each geographic description: 'us-east-1', us-east-2, us-west-1, and so on. These are the region identifyers that will need to be provided to the py-basic-ses command line application and library, so take note of which one you choose.  
+Once you are in the SES Management Console (you will see SES Home at the top of the left navigation panel), you will need to select the region you want your SES service to operate in. Each region reprsents an AWS data center's geogrphic location. Notice the labels next to each geographic description: us-east-1, us-east-2, us-west-1, and so on. These are the region identifyers that will need to be provided to the py-basic-ses command line application and library, so take note of which one you choose.  
 
 <img src="./docs/images/1.1_pick_region.JPG" height="300px"/>
-
-<br>
-
 
 Click on Domains in the left nav panel.  
 
 <img src="./docs/images/2_select_domains.JPG" height="300px"/>
 
-<br>
-
 Click Verify a New Domain
 
 <img src="./docs/images/3_click_verify_a_new_domain.JPG" height="300px"/>
-
-<br>
 
 Enter your domain (can be a subdomain), check the box next to Generate DKIM Settings, and click Verify This Domain.
 
 <img src="./docs/images/4_enter_domain.JPG" height="300px"/>
 
-<br>
-
 You will see the TXT DNS record you need to add to your domain to verify that you own it. If you used Route 53 to register your domain, go into your domain's hosted zone and add the TXT record.  
 
-You will also see three CNAME records that are needed for DKIM. There are three, be sure to scoll in the DKIM section. Again, if you used Route 53, add these CNAME records to your domains hosted zone.
+You will also see three CNAME records that are needed for DKIM. There are three. Be sure to scoll in the DKIM section. Again, if you used Route 53, add these CNAME records to your domain's hosted zone.
 
 <img src="./docs/images/5_txt_and_cname_records.JPG" height="300px"/>
-
-<br>
 
 After closing the modal with the verification information, you will see your domain listed in the SES Management Console with pending verification next to it. It will take a few minutes for SES to recognize the TXT and DKIM records you just added. Once your domain is verified, you will see 'verified' in green next to your domain.  
 
@@ -197,53 +184,37 @@ Being verified isn't enough. SES puts all new SES accounts in the Amazon SES san
 
 ### IAM setup
 
-IAM stands for Identity and Access Management. This is how you can create users to access various AWS resources via APIs, or even logging into the console on their browser. It allows you delegate access and permissions, as well as remove them.  
-
+IAM stands for Identity and Access Management. With the IAM Mangement Console you can create users, grant them access to APIs, and even allow them to log in to the AWS Mangement console.
 
 Before we create our new user, we need to take note of the ARN, or Amazon Resource Name of our domain in SES. Amazon identifies each resource with a unique identifyer - its ARN. We will need this in order to create the policy for our user later. To see the ARN for your domain in SES, click on the domain. 
 
 <img src="./docs/images/7.1_find_ARN_ses.JPG" height="300px"/>
 
-<br>
-
 Search for IAM in the top nav bar, and click IAM.  
 
 <img src="./docs/images/8_search_IAM.JPG" height="300px"/>
-
-<br>
 
 Click the Users link in the left nav panel.  
 
 <img src="./docs/images/9_iam_users_select.JPG" height="300px"/>
 
-<br>
-
 Click Add User.  
 
 <img src="./docs/images/10_iam_add_user.JPG" height="300px"/>
-
-<br>
 
 Enter your user name and select the check box next to Programmatic Access. Obviously, fill in the user you want, not the one in the screen shot.  
 
 <img src="./docs/images/11_enter_username.JPG" height="300px"/>
 
-<br>
-
-Click Next: Tags without setting up any permissions. We will handle permissions later. Then click Next: Review without adding tags. Finally, click Create User. You will then be at a one-time only screen to collect your credentials. DO NOT CLICK CLOSE until you have stored your Access Key ID and Secret access key.  
+Click Next: Tags without setting up any permissions. We will handle permissions later. Then click Next: Review without adding tags. Finally, click Create User. You will see a one-time only screen to collect your credentials. DO NOT CLICK CLOSE until you have stored your Access Key ID and Secret access key.  
 
 <img src="./docs/images/21_show_secret.JPG" height="300px"/>
-
-<br>
-
 
 You will now add the permissions required for the user you just made to send emails from the domain you setup in SES. Click on Users in the left nav panel. Then, click on the user you just made. Under Permissions policies, click Add inline policy.  
 
 <img src="./docs/images/22_add_inline_policy.JPG" height="300px"/>  
 
-<br>  
-
-In the Create Policy, click the JSON tab. Copy and paste the example SES policy json below into the json editor. Change the ARN listed after Resource: to the ARN of your domain in SES. Also, change the value after ses:FromAddress: to whatever email you want to limit your new IAM user to when indicating the email from address. You can remove this restriction, and allow the user to send from any email by removing the entire Condition object and its sub-objects from the JSON editor. There many other permissions that could be added to the Action object, but this policy just allows the user to send emails and raw emails.  
+In the Create Policy, click the JSON tab. Copy and paste the example SES policy json below into the json editor. Change the ARN listed after `"Resource":` to the ARN of your domain in SES. Also, change the value after `"ses:FromAddress":` to whatever email you want to limit your new IAM user to when indicating the email from address. You can remove this restriction, and allow the user to send from any email by removing the entire `"Condition":` object and its sub-objects from the JSON editor. There are many other permissions that could be added to the `"Action":` object, but this policy just allows the user to send emails and raw emails.  
 
 <img src="./docs/images/15_json_policy_entered.JPG" height="300px"/>  
 
@@ -271,12 +242,8 @@ In the Create Policy, click the JSON tab. Copy and paste the example SES policy 
 }
 ```
 
-Click Next without adding tags. And finally enter a name for your policy, and click create policy.
+Click Next without adding tags. Finally, enter a name for your policy, and click create policy.
 
 <img src="./docs/images/16_skip_tags.JPG" height="300px"/>
-
-<br>
-<br>
-
 
 That should be it. Your user should now be able to send email using the SES API for your domain.
