@@ -7,3 +7,5 @@ venv_py_basic_ses/
 .vscode/
 testing.py
 .coverage
+dist/
+build/
