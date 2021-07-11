@@ -1,9 +1,14 @@
 from setuptools import setup
 
+with open("README.md", "r") as fh:
+    readme_long_description = fh.read()
+
 setup(
     name='py-basic-ses',
     version='0.1.0',    
-    description="A simple python command line application and library to help send emails via Amazon Web Services' Simple Email Service, or AWS SES.",
+    description="py-basic-ses provides a command line application and library to send emails via Amazon Web Services' Simple Email Service, or AWS SES, API by leveraging the boto3 library.",
+    long_description=readme_long_description,
+    long_description_content_type="text/markdown",
     url='https://github.com/shinyshoes404/py-basic-ses',
     author='shinyshoes',
     author_email='shinyshoes404@protonmail.com',
@@ -18,7 +23,7 @@ setup(
     ],
 
     extras_require={
-        # To install reequirements for dev work use 'pip install -e .[dev]'
+        # To install requirements for dev work use 'pip install -e .[dev]'
         'dev': ['coverage', 'mock']
     },
 
