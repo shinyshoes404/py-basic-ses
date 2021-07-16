@@ -76,7 +76,7 @@ Below is a code sample demonstrating how you would send an email using py-basic-
 
 ```
 # import the SESSender class
-from py-basic-ses.emailing import SESSender
+from py_basic_ses.emailing import SESSender
 
 def ses_send_email():
     to_email_address = "to-user@to-domain.com" 
