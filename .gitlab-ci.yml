@@ -81,7 +81,7 @@ test-win-py39:                                                        # name of 
   
 
 # test job for python 3.10 on windows
-test-win-py38:                                                        # name of the job
+test-win-py310:                                                        # name of the job
   stage: test                                                         # the stage the job belongs to
   image: python:3.10-windowsservercore-1809                         # docker image to use to run the job
   tags:
@@ -105,7 +105,7 @@ test-win-py38:                                                        # name of 
 
 
 # test job for python 3.10 running on linux
-test-linux-py39:                                                      # name of the job
+test-linux-py310:                                                      # name of the job
   stage: test                                                         # the stage the job belongs to
   image: python:3.10-slim-bullseye                                     # use this docker image to run the job
   tags:
