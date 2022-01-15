@@ -197,7 +197,7 @@ publish:                                                                        
   script:
     - pip install twine                                                                       # install twine, a tool to publish python distribution packages
     - python setup.py sdist bdist_wheel                                                       # create distribution packages
-    - TWINE_PASSWORD=${PYPI_TOKEN} TWINE_USERNAME=__token__ python -m twine upload --repository-url https://pypi.org/project/py-basic-ses/ dist/* # upload distribution packages to the repo registry
+    - TWINE_PASSWORD=${PYPI_TOKEN} TWINE_USERNAME=__token__ python -m twine upload dist/* # upload distribution packages to the repo registry
 
 ### ------------------------------------------- END PUBLISH ---------------------------------------------- ###
 
