@@ -4,7 +4,7 @@ py-basic-ses provides a command line application and library to send emails via 
 **This package requires**
 
  - Linux or Windows 10
- - Python 3.8 or 3.9
+ - Python 3.8, 3.9, or 3.10
  - Dependencies that will install with this package:
      - boto3 (and its dependencies)
      - click (and its dependencies)
