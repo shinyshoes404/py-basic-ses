@@ -34,20 +34,18 @@ stages:
 .script-linux: &script-linux
   - echo "this is testing"
   - echo "python version" && python --version
-  - python -m venv venv
-  - source venv/bin/activate
-  - pip install coverage
-  - pip install .
-  - coverage run -m unittest discover -s tests
+  - python -m pip install --upgrade pip
+  - pip install .[dev]
+  - coverage run --source=src -m unittest discover -v -s tests
   - coverage report -m | grep TOTAL
 
 # create reusable script for windows tests
 .script-win: &script-win
   - echo "this is testing"
   - echo "python version"; python --version
-  - pip install coverage
-  - pip install .
-  - coverage run -m unittest discover -s tests
+  - python -m pip install --upgrade pip
+  - pip install .[dev]
+  - coverage run --source=src -m unittest discover -v -s tests
   - coverage xml
   - coverage report -m | Select-String "TOTAL"
 
