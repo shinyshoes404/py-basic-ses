@@ -263,3 +263,8 @@ Click Next without adding tags. Finally, enter a name for your policy, and click
 
 That should be it. Your user should now be able to send email using the SES API for your domain.
 
+## Release notes
+
+### v0.1.2
+ - Added support for python 3.10
+ - Added a .gitlab-ci.yml file for automated testing and publishing
