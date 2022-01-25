@@ -268,3 +268,6 @@ That should be it. Your user should now be able to send email using the SES API 
 ### v0.1.2
  - Added support for python 3.10
  - Added a .gitlab-ci.yml file for automated testing and publishing
+
+### v0.1.3
+ - Added python 3.10 programming language classifier to setup.py
