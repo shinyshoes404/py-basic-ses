@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='py-basic-ses',
-    version='0.1.2',    
+    version='0.1.3',    
     description="py-basic-ses provides a command line application and library to send emails via Amazon Web Services' Simple Email Service, or AWS SES, API by leveraging the boto3 library.",
     long_description=readme_long_description,
     long_description_content_type="text/markdown",
@@ -34,6 +34,7 @@ setup(
         'Operating System :: Microsoft :: Windows :: Windows 10',
         'Operating System :: POSIX :: Linux',           
         'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9'
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10'
     ],
 )
