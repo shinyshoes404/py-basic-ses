@@ -73,9 +73,12 @@ test-win-py39:                                                        # name of 
     - when: never                                                     # If not criteria were matched, do not run this job
   
   script: *script-win                                                 # predefined test script to run
-  artifacts:
+  coverage: '/^TOTAL.*\s+(\d+\%)$/'                                   # regex for capturing test coverage percentage
+  artifacts:                                                          # publish report to gitlab for enhanced features during merge request review
     reports:
-      cobertura: coverage.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
   
 
 # test job for python 3.10 on windows
@@ -97,9 +100,12 @@ test-win-py310:                                                        # name of
     - when: never                                                     # If not criteria were matched, do not run this job
 
   script: *script-win                                                 # predefined test script to run
-  artifacts:
+  coverage: '/^TOTAL.*\s+(\d+\%)$/'                                   # regex for capturing test coverage percentage
+  artifacts:                                                          # publish report to gitlab for enhanced features during merge request review
     reports:
-      cobertura: coverage.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
 
 
 # test job for python 3.10 running on linux
@@ -124,6 +130,12 @@ test-linux-py310:                                                      # name of
     - when: never                                                     # If not criteria were matched, do not run this job
   
   script: *script-linux                                               # run the scripted defined as an anchor above
+  coverage: '/^TOTAL.*\s+(\d+\%)$/'                                   # regex for capturing test coverage percentage
+  artifacts:                                                          # publish report to gitlab for enhanced features during merge request review
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
 
 # test job for python 3.9 running on linux
 test-linux-py39:                                                      # name of the job
@@ -147,6 +159,12 @@ test-linux-py39:                                                      # name of 
     - when: never                                                     # If not criteria were matched, do not run this job
   
   script: *script-linux                                               # run the scripted defined as an anchor above
+  coverage: '/^TOTAL.*\s+(\d+\%)$/'                                   # regex for capturing test coverage percentage
+  artifacts:                                                          # publish report to gitlab for enhanced features during merge request review
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
 
 
 # test job for python 3.8 running on linux
@@ -171,7 +189,12 @@ test-linux-py38:                                                      # name of 
     - when: never                                                     # If not criteria were matched, do not run this job
   
   script: *script-linux                                               # run the scripted defined as an anchor above
-
+  coverage: '/^TOTAL.*\s+(\d+\%)$/'                                   # regex for capturing test coverage percentage
+  artifacts:                                                          # publish report to gitlab for enhanced features during merge request review
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
 
 # ------------------------- end jobs --------------------------- #
 
@@ -197,7 +220,7 @@ publish:                                                                        
   script:
     - pip install twine                                                                       # install twine, a tool to publish python distribution packages
     - python setup.py sdist bdist_wheel                                                       # create distribution packages
-    - TWINE_PASSWORD=${PYPI_TOKEN} TWINE_USERNAME=__token__ python -m twine upload dist/* # upload distribution packages to the repo registry
+    - TWINE_PASSWORD=${PYPI_TOKEN} TWINE_USERNAME=__token__ python -m twine upload dist/*     # upload distribution packages to the repo registry
 
 ### ------------------------------------------- END PUBLISH ---------------------------------------------- ###
 
