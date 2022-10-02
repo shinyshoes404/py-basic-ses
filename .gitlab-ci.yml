@@ -36,7 +36,7 @@ stages:
   - echo "python version" && python --version
   - python -m pip install --upgrade pip
   - pip install -e .[dev]
-  - coverage run --source=src -m unittest discover -v -s tests
+  - coverage run --source=src -m unittest discover -v -s tests/unit
   - coverage report -m | grep TOTAL
 
 # create reusable script for windows tests
@@ -45,7 +45,7 @@ stages:
   - echo "python version"; python --version
   - python -m pip install --upgrade pip
   - pip install -e .[dev]
-  - coverage run --source=src -m unittest discover -v -s tests
+  - coverage run --source=src -m unittest discover -v -s tests/unit
   - coverage xml
   - coverage report -m | Select-String "TOTAL"
 
@@ -177,7 +177,7 @@ test-linux-py38:                                                      # name of 
 
 ### -------------------------------------------- PUBLISH ------------------------------------------------ ###
 
-# publish job - publish pypi package, but to swilsy | GIT, only on merge to master
+# publish job - publish package to pypi.org only on merge to master
 publish:                                                                                      # name of the job
   stage: publish                                                                              # will run in the publsh stage
   image: python:3.10-buster                                                                  # using buster because alpine had issues installing twine dependencies

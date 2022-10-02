@@ -4,12 +4,6 @@ import os, platform
 
 class SESSender:
     def __init__(self,sendto=None, fromaddr=None, message_txt=None, aws_region=None, fromname=None, msgsubject=None, message_html=None):
-        # Initialize check variable for credentials
-        self.aws_creds_present = False
-
-        # Initialize check variable for argument validation
-        self.required_args_present = False
-
         # set instance variables based on what was passed into __init__()
         self.sendto = sendto
         self.fromaddr = fromaddr
@@ -40,13 +34,9 @@ class SESSender:
             print("Error: aws_region is missing in the SESSender class's __init__() method. This argument is required.")
             return False
         
-        # if we made it this far, all of our required arguments are present
-        self.required_args_present = True
-
         # ---- AWS Credentials Validations ----        
         # Check for environment variables first
         if os.environ.get('AWS_ACCESS_KEY_ID') and os.environ.get('AWS_SECRET_ACCESS_KEY'):
-            self.aws_creds_present = True
             return True
         
         # Since we don't have the environment variables we need present, we will need to use a credentials file
@@ -113,7 +103,6 @@ class SESSender:
                         
                     # look for aws_access_key_id= and aws_secret_access_key=
                     if cred_content.find("aws_access_key_id=") != -1 and cred_content.find("aws_secret_access_key=") != -1 and cred_content.find("[default]") != -1:
-                        self.aws_creds_present = True
                         return True
                     else:
                         print("\nError: Your credentials file is missing something we need.")
@@ -126,19 +115,13 @@ class SESSender:
 
     def send_email(self):
 
-        # check for AWS cred flag
-        if self.aws_creds_present == False and self.required_args_present == False:
-            # if credentials have not ben validated, print error message and stop routine.
-            print("Error: You did not instantiate the SESSender clsss correctly, and you need to fix your credentials before trying to send an email.\n")
-            return False
-        
-        if self.aws_creds_present == False:
-            print("Error: You need to fix your credentials before trying to send an email.\n")
-            return False
-        
-        # check required arguments flag
-        if self.required_args_present == False:
-            print("Error: You are missing required arguments to instantiate the SESSender class.\n")
+        # make sure we have all of the required parameters before attempting to send an email
+        try:
+            if self.ses_validate() == False:
+                return False
+        except Exception as e:
+            print("unexpected exception")
+            print(e)
             return False
 
         # Replace sender@example.com with your "From" address.
@@ -174,9 +157,13 @@ class SESSender:
         # The character encoding for the email.
         self.CHARSET = "UTF-8"
 
-        # Create a new SES resource and specify a region.
-        self.client = boto3.client('ses',region_name=self.AWS_REGION)
-        
+        try:
+            # Create a new SES resource and specify a region.
+            self.client = boto3.client('ses',region_name=self.AWS_REGION)
+        except Exception as e:
+            print("unexpected exception")
+            print(e)
+            return False
 
         # Try to send the email.
         try:
@@ -208,7 +195,12 @@ class SESSender:
             )
         # Display an error if something goes wrong.	
         except ClientError as e:
+            print("client error")
             print(e.response['Error']['Message'])
+            return False
+        except Exception as e:
+            print("unexpected exception")
+            print(e)
             return False
         else:
             print("Email sent! Message ID:"),
