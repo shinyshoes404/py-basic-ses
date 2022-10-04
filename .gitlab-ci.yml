@@ -4,6 +4,7 @@
 
 stages:
   - test
+  - end2end
   - publish
   - release     
 
@@ -15,8 +16,8 @@ stages:
 # define changes anchor
 .changes: &changes
   - setup.py
-  - src/*
-  - tests/*
+  - src/**/*
+  - tests/**/*
   - .gitlab-ci.yml
   - pyproject.toml
 
@@ -36,7 +37,7 @@ stages:
   - echo "python version" && python --version
   - python -m pip install --upgrade pip
   - pip install -e .[dev]
-  - coverage run --source=src -m unittest discover -v -s tests
+  - coverage run --source=src -m unittest discover -v -s tests/unit
   - coverage report -m | grep TOTAL
 
 # create reusable script for windows tests
@@ -45,7 +46,7 @@ stages:
   - echo "python version"; python --version
   - python -m pip install --upgrade pip
   - pip install -e .[dev]
-  - coverage run --source=src -m unittest discover -v -s tests
+  - coverage run --source=src -m unittest discover -v -s tests/unit
   - coverage xml
   - coverage report -m | Select-String "TOTAL"
 
@@ -174,10 +175,32 @@ test-linux-py38:                                                      # name of 
 ### ------------------------------------- END TEST JOBS ------------------------------------------------- ###
 
 
+### -------------------------------------------- END TO END TESTING ------------------------------------------------ ###
+
+# send real emails using command line tool
+end2end:                                                                                     
+  stage: end2end                                                                              
+  image: python:3.10-buster                                                                  
+  tags:
+    - shared-linux                                                                            # use runner with this tag
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"  
+      when: on_success                                                                        
+
+  script:
+    - pip install .
+    - export AWS_ACCESS_KEY_ID=${SES_ACCESS_KEY_ID}
+    - export AWS_SECRET_ACCESS_KEY = ${SES_SECRET_KEY}                                                                  
+    - send-test --to ${TO_ADDR} --fromaddr ${FROM_ADDR} #--awsregion ${SES_REGION}
+    - send-email --to ${TO_ADDR} --fromaddr ${FROM_ADDR} --awsregion ${SES_REGION} --fromname 'py-basic-ses-tester' --subject 'test subject' --message_txt 'plain email text' --message_html '<h1>py-basic-ses test</h1><p>test email html message</p>'
+
+### ------------------------------------------- END END TO END TESTING ---------------------------------------------- ###
+
+
 
 ### -------------------------------------------- PUBLISH ------------------------------------------------ ###
 
-# publish job - publish pypi package, but to swilsy | GIT, only on merge to master
+# publish job - publish package to pypi.org only on merge to master
 publish:                                                                                      # name of the job
   stage: publish                                                                              # will run in the publsh stage
   image: python:3.10-buster                                                                  # using buster because alpine had issues installing twine dependencies
