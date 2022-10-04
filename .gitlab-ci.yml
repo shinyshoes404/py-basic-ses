@@ -185,9 +185,7 @@ end2end:
     - shared-linux                                                                            # use runner with this tag
   rules:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"               # Execute this job if the merge target branch is main and if the files we care about have changes                                           
-      when: on_success 
-    - if: $CI_COMMIT_BRANCH == "dev"  
-      when: on_success                                                                        
+      when: on_success                                                        
 
   script:
     - pip install .
