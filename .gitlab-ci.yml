@@ -67,9 +67,9 @@ test-win-py310:                                                        # name of
       when: on_success                                                # Execute job if jobs from previous stage are successful. In this case always and on_success will 
                                                                       # yield the same result, because this job is part of the first stage.
 
-    # - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main"   # Execute this job if the commit target branch is dev or main. This includes pushes from users and post merge commits
-    #   changes: *changes                                               # Execute the job if any of the files we care about were changed as defined above.
-    #   when: on_success                                                # Execute job if jobs from previous stage are successful.
+    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main"   # Execute this job if the commit target branch is dev or main. This includes pushes from users and post merge commits
+      changes: *changes                                               # Execute the job if any of the files we care about were changed as defined above.
+      when: on_success                                                # Execute job if jobs from previous stage are successful.
 
     - when: never                                                     # If not criteria were matched, do not run this job
 
@@ -193,7 +193,7 @@ end2end:
     - pip install .
     - export AWS_ACCESS_KEY_ID=${SES_ACCESS_KEY_ID}
     - export AWS_SECRET_ACCESS_KEY=${SES_SECRET_KEY}                                                                  
-    - send-test --to ${TO_ADDR} --fromaddr ${FROM_ADDR} #--awsregion ${SES_REGION}
+    - send-test --to ${TO_ADDR} --fromaddr ${FROM_ADDR} --awsregion ${SES_REGION}
     - send-email --to ${TO_ADDR} --fromaddr ${FROM_ADDR} --awsregion ${SES_REGION} --fromname 'py-basic-ses-tester' --subject 'test subject' --message_txt 'plain email text' --message_html '<h1>py-basic-ses test</h1><p>test email html message</p>'
 
 ### ------------------------------------------- END END TO END TESTING ---------------------------------------------- ###
