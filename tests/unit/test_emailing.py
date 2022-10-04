@@ -1,5 +1,6 @@
 import os, unittest, mock
-from botocore.exceptions import ClientError
+import boto3
+from botocore.stub import Stubber
 
 # import the SESSender class, so we can test it
 from py_basic_ses.emailing import SESSender
@@ -178,13 +179,32 @@ class TestEmailingSESSenderSendEmail(unittest.TestCase):
                 check_val = validation_obj.send_email()
                 self.assertIs(check_val, False)
 
-    # def test_unit_send_email_clienterror_exception(self):
-    #     with mock.patch("py_basic_ses.emailing.SESSender.ses_validate", return_value=True) as mock_sesvalidate:
-    #         with mock.patch("py_basic_ses.emailing.boto3.client") as mock_botoclient:
-    #             with mock.patch.object(ClientError,'response',mock.Mock(return_value="fake resp")) as mock_ce:
-    #                 mock_botoclient.return_value.send_email.side_effect = ClientError
-    #                 validation_obj = SESSender(sendto="email@domain.com", fromaddr="email@domain.com", message_txt="some text", aws_region="us-west-2")
-    #                 check_val = validation_obj.send_email()
-    #                 self.assertIs(check_val, False)
+    def test_unit_send_email_clienterror_exception(self):
+        stubbed_client = boto3.client('ses', region_name='us-west-2')
+        stubber = Stubber(stubbed_client)
+        stubber.add_client_error('send_email')
+        stubber.activate()
+        with mock.patch("py_basic_ses.emailing.SESSender.ses_validate", return_value=True) as mock_sesvalidate:
+            with mock.patch("py_basic_ses.emailing.boto3.client") as mock_botoclient:
+                mock_botoclient.return_value = stubbed_client
+                validation_obj = SESSender(sendto="email@domain.com", fromaddr="email@domain.com", message_txt="some text", aws_region="us-west-2")
+                check_val = validation_obj.send_email()
+                self.assertIs(check_val, False)
+
+    def test_unit_send_email_unexpected_exception(self):
+        with mock.patch("py_basic_ses.emailing.SESSender.ses_validate", return_value=True) as mock_sesvalidate:
+            with mock.patch("py_basic_ses.emailing.boto3.client") as mock_botoclient:
+                mock_botoclient.return_value.send_email.side_effect = Exception("fake unexpected exception")
+                validation_obj = SESSender(sendto="email@domain.com", fromaddr="email@domain.com", message_txt="some text", aws_region="us-west-2")
+                check_val = validation_obj.send_email()
+                self.assertIs(check_val, False)
+
+    def test_unit_send_email_sends(self):
+        with mock.patch("py_basic_ses.emailing.SESSender.ses_validate", return_value=True) as mock_sesvalidate:
+            with mock.patch("py_basic_ses.emailing.boto3.client") as mock_botoclient:
+                mock_botoclient.return_value.send_email.return_value = {"MessageId":"fakemsgID"}
+                validation_obj = SESSender(sendto="email@domain.com", fromaddr="email@domain.com", message_txt="some text", aws_region="us-west-2")
+                check_val = validation_obj.send_email()
+                self.assertIs(check_val, True)
 
 
