@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='py-basic-ses',
-    version='1.1.0',    
+    version='1.1.1',    
     description="py-basic-ses provides a command line application and library to send emails via Amazon Web Services' Simple Email Service, or AWS SES, API by leveraging the boto3 library.",
     long_description=readme_long_description,
     long_description_content_type="text/markdown",
@@ -27,14 +27,15 @@ setup(
         'dev': ['coverage', 'mock']
     },
 
-    python_requires = '>=3.8.*,!=3.11.*',
+    python_requires = '>=3.8,!=3.12.*',
 
     classifiers=[
         'License :: OSI Approved :: MIT License',
-        'Operating System :: Microsoft :: Windows :: Windows 10',
+        'Operating System :: Microsoft :: Windows',
         'Operating System :: POSIX :: Linux',           
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10'
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11'
     ],
 )
