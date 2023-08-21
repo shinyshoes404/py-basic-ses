@@ -302,7 +302,7 @@ semgrep-sast:
 # ------------------ DEPENDENCY SCAN ----------------- #
 
 # test job for snyk dependency scan
-test-sec-snyk:                                                      
+dep-sec-test-snyk:                                                      
   stage: sec-scan                                                
   image: python:3.11-slim-bullseye                               
   tags:
@@ -330,7 +330,7 @@ test-sec-snyk:
     - mv ./snyk /usr/local/bin/
     - snyk auth ${SNYK_TOKEN}
     - pip install .
-    - snyk test --file=setup.py --severity-threshold=high                                          
+    - snyk test --file=setup.py --severity-threshold=low                                          
 
 
 # ------------------ END OF DEPENDENCY SCAN ----------------- #
