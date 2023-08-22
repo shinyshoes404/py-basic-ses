@@ -4,6 +4,7 @@
 
 stages:
   - test
+  - sec-scan
   - end2end
   - publish
   - release     
@@ -82,13 +83,47 @@ test-win-py310:                                                        # name of
         path: coverage.xml
 
 
-# test job for python 3.10 running on linux
-test-linux-py310:                                                      # name of the job
+test-linux-py311:                                                      # name of the job
   stage: test                                                         # the stage the job belongs to
-  image: python:3.10-slim-bullseye                                     # use this docker image to run the job
+  image: python:3.11-alpine3.18                                     # use this docker image to run the job
   tags:
     - shared-linux                                                    # use runner with this tag
   rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: on_success
+
+    - if: $CI_COMMIT_TAG                                              # If a tag is set, it's because the release was just created, we don't need to run this job again
+      when: never
+      
+    - if: $CI_PIPELINE_SOURCE == "push"                               # Execute this job if the pipeline is initiated by a push. This will include post merge commits.
+      changes: *changes                                               # Execute this job only if the files we care about have changed
+      when: on_success                                                # Execute job if jobs from previous stage are successful. In this case always and on_success will 
+                                                                      # yield the same result, because this job is part of the first stage.
+    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main"   # Execute this job if the commit target branch is dev or main. This includes pushes from users and post merge commits
+      changes: *changes                                               # Execute the job if any of the files we care about were changed as defined above.
+      when: on_success                                                # Execute job if jobs from previous stage are successful.
+                                                                      # Added this if to make sure that these jobs run when a pipeline is manually run from the UI
+
+    - when: never                                                     # If not criteria were matched, do not run this job
+  
+  script: *script-linux                                               # run the scripted defined as an anchor above
+  coverage: '/^TOTAL.*\s+(\d+\%)$/'                                   # regex for capturing test coverage percentage
+  artifacts:                                                          # publish report to gitlab for enhanced features during merge request review
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+# test job for python 3.10 running on linux
+test-linux-py310:                                                      # name of the job
+  stage: test                                                         # the stage the job belongs to
+  image: python:3.10-slim-bookworm                                     # use this docker image to run the job
+  tags:
+    - shared-linux                                                    # use runner with this tag
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: on_success
+
     - if: $CI_COMMIT_TAG                                              # If a tag is set, it's because the release was just created, we don't need to run this job again
       when: never
       
@@ -118,6 +153,9 @@ test-linux-py39:                                                      # name of 
   tags:
     - shared-linux                                                    # use runner with this tag
   rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: on_success
+
     - if: $CI_COMMIT_TAG                                              # If a tag is set, it's because the release was just created, we don't need to run this job again
       when: never
       
@@ -144,10 +182,13 @@ test-linux-py39:                                                      # name of 
 # test job for python 3.8 running on linux
 test-linux-py38:                                                      # name of the job
   stage: test                                                         # the stage the job belongs to
-  image: python:3.8-slim-bullseye                                     # use this docker image to run the job
+  image: python:3.8-alpine3.18                                     # use this docker image to run the job
   tags:
     - shared-linux                                                    # use runner with this tag
   rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: on_success
+
     - if: $CI_COMMIT_TAG                                              # If a tag is set, it's because the release was just created, we don't need to run this job again
       when: never
 
@@ -175,15 +216,143 @@ test-linux-py38:                                                      # name of 
 ### ------------------------------------- END TEST JOBS ------------------------------------------------- ###
 
 
+### ------------------------------------ SECURITY SCANS --------------------------------------- ###
+
+# ------------------ SAST SCAN ----------------- #
+variables:
+  # Setting this variable will affect all Security templates
+  # (SAST, Dependency Scanning, ...)
+  SECURE_ANALYZERS_PREFIX: "$CI_TEMPLATE_REGISTRY_HOST/security-products"
+  SAST_IMAGE_SUFFIX: ""
+
+  SAST_EXCLUDED_ANALYZERS: ""
+  SAST_EXCLUDED_PATHS: "spec, test, tests, tmp"
+  SCAN_KUBERNETES_MANIFESTS: "false"
+
+sast:
+  stage: sec-scan
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
+  rules:
+    - when: never
+  variables:
+    SEARCH_MAX_DEPTH: 4
+  script:
+    - echo "$CI_JOB_NAME is used for configuration only, and its script should not be executed"
+    - exit 1
+
+.sast-analyzer:
+  extends: sast
+  allow_failure: false
+  # `rules` must be overridden explicitly by each child job
+  # see https://gitlab.com/gitlab-org/gitlab/-/issues/218444
+  script:
+    - /analyzer run
+    - |
+        echo "---- checking log ----";
+        test_critical=$(cat gl-sast-report.json | { grep -c "\"severity\"\:\"Critical\"" || true; });
+        echo "--- test critical ---"
+        echo $test_critical
+
+        if [[ "$test_critical" == 0 ]]; 
+          then echo "no critical vulnerabilities found";
+          else echo "critical vulnerabilities found in report" && 
+            echo " ------ gl-sast-report.json ---------" &&
+            cat gl-sast-report.json && 
+            exit 1;
+        fi;
+
+semgrep-sast:
+  extends: .sast-analyzer
+  image:
+    name: "$SAST_ANALYZER_IMAGE"
+  variables:
+    SEARCH_MAX_DEPTH: 20
+    SAST_ANALYZER_IMAGE_TAG: 4
+    SAST_ANALYZER_IMAGE: "$SECURE_ANALYZERS_PREFIX/semgrep:$SAST_ANALYZER_IMAGE_TAG$SAST_IMAGE_SUFFIX"
+  rules:
+    - if: $SAST_DISABLED == 'true' || $SAST_DISABLED == '1'
+      when: never
+
+    - if: $SAST_EXCLUDED_ANALYZERS =~ /semgrep/
+      when: never
+
+    - if: $CI_COMMIT_MESSAGE =~ /(run sec scan)/ 
+      when: on_success
+
+    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main"
+      when: on_success 
+
+      exists:
+        - '**/*.py'
+        - '**/*.js'
+        - '**/*.jsx'
+        - '**/*.ts'
+        - '**/*.tsx'
+        - '**/*.c'
+        - '**/*.go'
+        - '**/*.java'
+        - '**/*.cs'
+        - '**/*.html'
+        - '**/*.scala'
+        - '**/*.sc'
+
+
+# ------------------ DEPENDENCY SCAN ----------------- #
+
+# test job for snyk dependency scan
+dep-sec-test-snyk:                                                      
+  stage: sec-scan                                                
+  image: python:3.11-slim-bullseye                               
+  tags:
+    - shared-linux                                                 
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main"                                         
+      when: on_success      
+
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: on_success
+
+    - if: $CI_COMMIT_MESSAGE =~ /(run sec scan)/
+      when: on_success                                
+                                                        
+  script:
+    - echo "STARTING DEPENDENCY SCANS"
+    - ls -lah
+    - echo "python version" && python --version
+    - python -m pip install --upgrade pip
+    - apt update
+    - apt upgrade -y
+    - apt install curl -y
+    - curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
+    - chmod +x ./snyk
+    - mv ./snyk /usr/local/bin/
+    - snyk auth ${SNYK_TOKEN}
+    - pip install .
+    - snyk test --file=setup.py --severity-threshold=medium                                          
+
+
+# ------------------ END OF DEPENDENCY SCAN ----------------- #
+
+### ----------------------- END OF SECURITY TESTS--------------------- ###
+
+
+
+
+
 ### -------------------------------------------- END TO END TESTING ------------------------------------------------ ###
 
 # send real emails using command line tool
 end2end:                                                                                     
   stage: end2end                                                                              
-  image: python:3.10-buster                                                                  
+  image: python:3.11-buster                                                                  
   tags:
     - shared-linux                                                                            # use runner with this tag
   rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"                                                     # Don't run if the pipeline is triggered by a schedule
+      when: never
+
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"               # Execute this job if the merge target branch is main and if the files we care about have changes                                           
       when: on_success                                                        
 
