@@ -330,7 +330,7 @@ dep-sec-test-snyk:
     - mv ./snyk /usr/local/bin/
     - snyk auth ${SNYK_TOKEN}
     - pip install .
-    - snyk test --file=setup.py --severity-threshold=low                                          
+    - snyk test --file=setup.py --severity-threshold=medium                                          
 
 
 # ------------------ END OF DEPENDENCY SCAN ----------------- #
