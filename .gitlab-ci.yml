@@ -353,8 +353,8 @@ end2end:
     - if: $CI_PIPELINE_SOURCE == "schedule"                                                     # Don't run if the pipeline is triggered by a schedule
       when: never
 
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"               # Execute this job if the merge target branch is main and if the files we care about have changes                                           
-      when: on_success                                                        
+    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main"                                         
+      when: on_success                                                       
 
   script:
     - pip install .
