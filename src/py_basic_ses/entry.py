@@ -1,5 +1,7 @@
 import click, sys
 from py_basic_ses.emailing import SESSender
+from py_basic_ses.exceptions import CredError
+from botocore.exceptions import ClientError
 
 @click.command()
 @click.option("--to", default="", help="Address you are sending to. Required")
@@ -24,27 +26,35 @@ def send_test_email(to, fromaddr, awsregion):
         click.echo(e)
         sys.exit(1)
     
-    try:
-        # validate the arguments and credentials
-        check_validation = ses_send_obj.ses_validate()
-        if check_validation == False:
-            sys.exit(1)
-    except Exception as e:
-        click.echo("unexpected exception")
-        click.echo(e)
-        sys.exit(1)
 
-    # if everything validated, try to send the email
     click.echo("Attempting to send a test email to {0}".format(to))
     try:
-        if ses_send_obj.send_email() == True:
+        # try to send the email
+        send_result = ses_send_obj.send_email()
+        if send_result:
+            click.echo(f'email sent! message id: {send_result}')
             sys.exit(0)
         else:
+            click.echo('unexpected error')
             sys.exit(1)
+    
+    except CredError as e:
+        click.echo(f"error: {e.__str__()}")
+        sys.exit(2)
+
+    except OSError as e:
+        click.echo(f"error: {e.__str__()}")
+        sys.exit(3)
+    
+    except ClientError as e:
+        click.echo("client error")
+        click.echo(e.response['Error']['Message'])
+        sys.exit(4)
+
     except Exception as e:
-        click.echo("unexpected exception")
-        click.echo(e)
-        sys.exit(1)
+        click.echo("unexpected error")
+        click.echo(e.__str__())
+        sys.exit(5)    
 
 
 
@@ -79,24 +89,30 @@ def send_email(to, fromaddr, awsregion, message_txt, message_html, subject, from
         sys.exit(1)
 
     try:
-        # validate the arguments and credentials
-        check_validation = ses_send_obj.ses_validate()
-        if check_validation == False:
-            sys.exit(1)
-    except Exception as e:
-        click.echo("unexpected exception")
-        click.echo(e)
-        sys.exit(1)
-
-    try:
-        # if everything validated, try to send the email
-        click.echo("Attempting to send an email to {0}".format(to))
-        if ses_send_obj.send_email() == True:
+        # try to send the email
+        click.echo("Attempting to send an email to {0}".format(to))        
+        send_result = ses_send_obj.send_email()
+        if send_result:
+            click.echo(f'email sent! message id: {send_result}')
             sys.exit(0)
         else:
+            click.echo('unexpected error')
             sys.exit(1)
     
+    except CredError as e:
+        click.echo(f"error: {e.__str__()}")
+        sys.exit(2)
+
+    except OSError as e:
+        click.echo(f"error: {e.__str__()}")
+        sys.exit(3)
+    
+    except ClientError as e:
+        click.echo("client error")
+        click.echo(e.response['Error']['Message'])
+        sys.exit(4)
+
     except Exception as e:
-        click.echo("unexpected exception")
-        click.echo(e)
-        sys.exit(1)
+        click.echo("unexpected error")
+        click.echo(e.__str__())
+        sys.exit(5)    
