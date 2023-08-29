@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='py-basic-ses',
-    version='1.1.1',    
+    version='2.0.0',    
     description="py-basic-ses provides a command line application and library to send emails via Amazon Web Services' Simple Email Service, or AWS SES, API by leveraging the boto3 library.",
     long_description=readme_long_description,
     long_description_content_type="text/markdown",
