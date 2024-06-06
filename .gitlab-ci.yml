@@ -358,6 +358,8 @@ dep-sec-test-snyk:
     - ls -lah
     - echo "python version" && python --version
     - python -m pip install --upgrade pip
+    - ls -l /bin/sh
+    - dpkg --verify
     - apt update
     - apt upgrade -y
     - apt install curl -y
