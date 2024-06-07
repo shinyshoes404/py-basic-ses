@@ -340,7 +340,7 @@ semgrep-sast:
 # test job for snyk dependency scan
 dep-sec-test-snyk:                                                      
   stage: sec-scan                                                
-  image: python:3.11-slim-bullseye                               
+  image: python:3.11-slim-bookworm                               
   tags:
     - shared-linux                                                 
   rules:
